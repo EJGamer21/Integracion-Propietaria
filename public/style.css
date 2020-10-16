@@ -1,0 +1,29 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.formulario {
+    display: block;
+    text-align: center;
+    width:100%;
+}
+input {
+    background-color:rgb(236, 236, 236);
+    width:35%;
+    border-radius:5px;
+    margin:20px 0px;
+    padding: 5px 0px 5px 5px;
+}
+button {
+    background-color:green;
+    width:35%;
+    border-radius:5px;
+    padding:10px;
+    border:none;
+    align-self: auto;
+}
+
+button#download {
+    background-color: red;
+}

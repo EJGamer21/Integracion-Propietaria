@@ -25,8 +25,21 @@ namespace Iso810
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<MainContext>(options => {
+            services.AddDbContext<MainContext>(options =>
+            {
                 options.UseSqlServer(Configuration.GetConnectionString("Default"));
+            });
+
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                    builder =>
+                    {
+                        builder
+                            .AllowAnyOrigin()
+                            .AllowAnyMethod()
+                            .AllowAnyHeader();
+                    });
             });
             services.AddControllers();
         }
@@ -40,6 +53,8 @@ namespace Iso810
             }
 
             app.UseRouting();
+
+            app.UseCors();
 
             app.UseAuthorization();
 
