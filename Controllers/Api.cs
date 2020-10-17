@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Iso810.Entities;
+using Microsoft.AspNetCore.Http;
+using System.IO;
 
 namespace Iso810.Controllers
 {
@@ -25,8 +27,11 @@ namespace Iso810.Controllers
         }
 
         [HttpPost("upload")]
-        public async Task<IEnumerable<StudentsView>> Upload([FromBody] int id)
-        {             
+        public async Task<IEnumerable<StudentsView>> Upload(IFormFile file)
+        {
+
+            var reader = new StreamReader(file.OpenReadStream());
+            var content = await reader.ReadToEndAsync();
 
             return await _context.StudentsView.ToListAsync();
         }
