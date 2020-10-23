@@ -1,0 +1,55 @@
+USE Iso810
+GO
+
+BEGIN TRANSACTION
+GO
+
+INSERT INTO [Provincias] VALUES ('AZUA'), ('BARAHONA'), ('PERAVIA')
+INSERT INTO [Sectores] VALUES ('PUBLICO'), ('PRIVADO')
+INSERT INTO [Secciones] VALUES ('A'), ('B'), ('C'), ('D')
+INSERT INTO [Grados] VALUES ('1'), ('2'), ('3'), ('4'), ('5'), ('6')
+GO
+
+INSERT INTO [Secciones_Grados] VALUES (1, 1), (1, 2), (2, 3), (4, 4)
+GO
+
+INSERT INTO [Escuelas] VALUES
+    (1, 'HERNANDO GORJON', NULL, 1, 2)
+    ,(2, 'BIENVENIDO MORILLO', NULL, 2, 2)
+    ,(3, 'ADELAIDA DIAZ', NULL, 1, 3)
+GO
+
+INSERT INTO [Estudiantes] VALUES
+    (20182200, 'PEPE', 'AGALLAS', '2000-11-21', 1, 1)
+    ,(20182100, 'MIGUEL', 'ORCADO', '2000-12-11', 1, 2)
+    ,(20182300, 'SAM', 'BROWN', '2000-10-04', 2, 4)
+    ,(20182400, 'PEDRO', 'JIMENEZ', '2000-10-31', 3, 1)
+GO
+
+INSERT INTO [Tandas] VALUES ('MATUTINA', '0800', '1200')
+    ,('VESPERTINA', '1201', '1800')
+    ,('NOCTURNA', '1801', '2200')
+GO
+
+INSERT INTO [Asignaturas] VALUES 
+    ('QUIMICA', 1)
+    ,('LITERATURA', 1)
+    ,('LITERATURA', 2)
+    ,('MATEMATICA', 2)
+    ,('MATEMATICA', 3)
+    ,('GEOGRAFIA', 1)
+    ,('BIOLOGIA', 2)
+GO
+
+INSERT INTO [Asignaturas_Estudiantes] VALUES 
+    (98, 'APROBADO', 20182200, 1)
+    ,(75, 'APROBADO', 20182400, 4)
+    ,(83, 'APROBADO', 20182300, 5)
+    ,(55, 'REPROBADO', 20182100, 1)
+    ,(88, 'APROBADO', 20182300, 6)
+    ,(67, 'REPROBADO', 20182100, 7)
+    ,(74, 'APROBADO', 20182200, 3)
+GO
+
+COMMIT
+GO

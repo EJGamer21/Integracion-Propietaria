@@ -8,8 +8,8 @@ namespace Iso810.Entities
         public int Id { get; set; }
         public int Calificacion { get; set; }
         public string CondicionAcademica { get; set; }
-        public int? EstudianteId { get; set; }
-        public int? AsignaturaId { get; set; }
+        public int EstudianteId { get; set; }
+        public int AsignaturaId { get; set; }
 
         public virtual Asignaturas Asignatura { get; set; }
         public virtual Estudiantes Estudiante { get; set; }

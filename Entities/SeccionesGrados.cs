@@ -11,8 +11,8 @@ namespace Iso810.Entities
         }
 
         public int Id { get; set; }
-        public int? SeccionId { get; set; }
-        public int? GradoId { get; set; }
+        public int SeccionId { get; set; }
+        public int GradoId { get; set; }
 
         public virtual Grados Grado { get; set; }
         public virtual Secciones Seccion { get; set; }

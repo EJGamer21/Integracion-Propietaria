@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Iso810.Entities;
 using Microsoft.AspNetCore.Http;
 using System.IO;
+using Iso810.Services.Contracts;
 
 namespace Iso810.Controllers
 {
@@ -14,10 +15,12 @@ namespace Iso810.Controllers
     public class ApiController : ControllerBase
     {
         private readonly MainContext _context;
+        private readonly ICsvService _csvService;
 
-        public ApiController(MainContext context)
+        public ApiController(MainContext context, ICsvService csvService)
         {
             _context = context;
+            _csvService = csvService;
         }
         
         [HttpGet]
@@ -29,20 +32,26 @@ namespace Iso810.Controllers
         [HttpPost("upload")]
         public async Task<IEnumerable<StudentsView>> Upload(IFormFile file)
         {
-
-            var reader = new StreamReader(file.OpenReadStream());
-            var content = await reader.ReadToEndAsync();
-
-            return await _context.StudentsView.ToListAsync();
+            try
+            {
+                StreamReader reader = new StreamReader(file.OpenReadStream());
+                string content = await reader.ReadToEndAsync();
+                return await _csvService.UploadData(content);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error has been detected.", ex);
+            }
         }
 
         [HttpGet("download")]
-        public async Task<IActionResult> Download()
+        public async Task<object> Download()
         {
             try
             {
-                var response = await _context.StudentsView.ToListAsync();
-                return Ok(new { Response = response });
+                var header = _csvService.GetHeaders();
+                var data = await _csvService.DownloadData();
+                return new { header = header, data = data };
             }
             catch (Exception ex)
             {

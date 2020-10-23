@@ -35,13 +35,11 @@
                 },
                 async download() {
                     const request = await fetch("http://localhost:5000/api/download");
-                    const { response } = await request.json();
+                    const { header, data } = await request.json();
 
                     let csvContent = "data:text/csv;charset=utf-8,";
-                    csvContent += this.getHeader(response[0]);
-                    
-                    /* get content */
-                    csvContent += response.map(this.object2Line, this).join("");
+                    csvContent += this.getHeader(header);
+                    csvContent += data;
                     
                     const uri = encodeURI(csvContent);
 
@@ -52,35 +50,21 @@
 
                     link.click();
                 },
-                isLastProperty(prop, arr) {
-                    return prop === arr[arr.length - 1]
+                isLastProperty(property, array) {
+                    return property === array[array.length - 1];
                 },
-                object2Line(obj) {
+                getHeader(source = "") {
                     let text = "";
-                    const keys = Object.keys(obj);
-
-                    for (const key of keys) {
-                        text += this.isLastProperty(key, keys)
-                            ? obj[key] + "\n"
-                            : obj[key] + ",";
-
-                    }
-                    console.log(text)
-
-                    return text
-                },
-                getHeader(obj) {
-                    let text = "";
-                    const keys = Object.keys(obj);
+                    const values = source.split(',');
 
                     const toSentence = (txt) => {
                         return txt.replace(/([A-Z])/g, " $1");
                     }
 
-                    for (const key of keys) {
-                        text += this.isLastProperty(key, keys)
-                            ? toSentence(key).toUpperCase() + "\n"
-                            : toSentence(key).toUpperCase() + ",";
+                    for (const value of values) {
+                        text += this.isLastProperty(value, values)
+                            ? toSentence(value).toUpperCase() + "\n"
+                            : toSentence(value).toUpperCase() + ",";
                     }
 
                     return text

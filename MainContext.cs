@@ -48,6 +48,7 @@ namespace Iso810
                 entity.HasOne(d => d.Tanda)
                     .WithMany(p => p.Asignaturas)
                     .HasForeignKey(d => d.TandaId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__Asignatur__Tanda__398D8EEE");
             });
 
@@ -64,16 +65,20 @@ namespace Iso810
                 entity.HasOne(d => d.Asignatura)
                     .WithMany(p => p.AsignaturasEstudiantes)
                     .HasForeignKey(d => d.AsignaturaId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__Asignatur__Asign__3D5E1FD2");
 
                 entity.HasOne(d => d.Estudiante)
                     .WithMany(p => p.AsignaturasEstudiantes)
                     .HasForeignKey(d => d.EstudianteId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__Asignatur__Estud__3C69FB99");
             });
 
             modelBuilder.Entity<Escuelas>(entity =>
             {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
                 entity.Property(e => e.Direccion)
                     .HasMaxLength(150)
                     .IsUnicode(false);
@@ -86,33 +91,26 @@ namespace Iso810
                 entity.HasOne(d => d.Provincia)
                     .WithMany(p => p.Escuelas)
                     .HasForeignKey(d => d.ProvinciaId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__Escuelas__Provin__30F848ED");
 
                 entity.HasOne(d => d.Sector)
                     .WithMany(p => p.Escuelas)
                     .HasForeignKey(d => d.SectorId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__Escuelas__Sector__300424B4");
             });
 
             modelBuilder.Entity<Estudiantes>(entity =>
             {
                 entity.HasKey(e => e.Matricula)
-                    .HasName("PK__Estudian__0FB9FB4EBDC42741");
+                    .HasName("PK__Estudian__0FB9FB4E7EDDBC22");
 
                 entity.Property(e => e.Matricula).ValueGeneratedNever();
 
-                entity.Property(e => e.Apellido)
-                    .IsRequired()
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.FechaNacimiento)
-                    .HasColumnName("Fecha_nacimiento")
-                    .HasColumnType("date");
-
                 entity.Property(e => e.Nombre)
                     .IsRequired()
-                    .HasMaxLength(100)
+                    .HasMaxLength(200)
                     .IsUnicode(false);
 
                 entity.Property(e => e.SeccionGradoId).HasColumnName("Seccion_GradoId");
@@ -120,11 +118,13 @@ namespace Iso810
                 entity.HasOne(d => d.Escuela)
                     .WithMany(p => p.Estudiantes)
                     .HasForeignKey(d => d.EscuelaId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__Estudiant__Escue__33D4B598");
 
                 entity.HasOne(d => d.SeccionGrado)
                     .WithMany(p => p.Estudiantes)
                     .HasForeignKey(d => d.SeccionGradoId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__Estudiant__Secci__34C8D9D1");
             });
 
@@ -159,11 +159,13 @@ namespace Iso810
                 entity.HasOne(d => d.Grado)
                     .WithMany(p => p.SeccionesGrados)
                     .HasForeignKey(d => d.GradoId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__Secciones__Grado__2D27B809");
 
                 entity.HasOne(d => d.Seccion)
                     .WithMany(p => p.SeccionesGrados)
                     .HasForeignKey(d => d.SeccionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__Secciones__Secci__2C3393D0");
             });
 
@@ -210,7 +212,7 @@ namespace Iso810
 
                 entity.Property(e => e.NombreDelEstudiante)
                     .HasColumnName("NOMBRE DEL ESTUDIANTE")
-                    .HasMaxLength(201)
+                    .HasMaxLength(200)
                     .IsUnicode(false);
 
                 entity.Property(e => e.Provincia)
