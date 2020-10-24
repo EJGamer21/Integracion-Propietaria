@@ -59,11 +59,6 @@ namespace Iso810.Services
 
         public async Task<ICollection<StudentsView>> ImportFile(Stream stream)
         {
-            // var root = new XmlRootAttribute("root");
-
-            // var serializer = new XmlSerializer(typeof(List<StudentsView>), root);
-            // var list = (List<StudentsView>) serializer.Deserialize(stream);
-
             var xml = XElement.Load(stream);
             var root = xml.Elements();
             var list = new List<StudentsView>();
