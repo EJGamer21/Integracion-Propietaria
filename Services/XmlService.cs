@@ -87,9 +87,4 @@ namespace Iso810.Services
             return list;
         }
     }
-
-    class StudentsViewList
-    {
-
-    }
 }
