@@ -20,7 +20,7 @@ namespace Iso810.Services
             foreach (var info in source)
             {
                 var grado = await _context.Grados
-                    .FirstOrDefaultAsync(x => x.Nombre == info.Grado);
+                    .FirstOrDefaultAsync(x => x.Nombre.ToLower() == info.Grado.ToLower());
                 
                 if (grado is null)
                 {
@@ -29,7 +29,7 @@ namespace Iso810.Services
                 }
 
                 var seccion = await _context.Secciones
-                    .FirstOrDefaultAsync(x => x.Nombre == info.Seccion);
+                    .FirstOrDefaultAsync(x => x.Nombre.ToLower() == info.Seccion.ToLower());
                 
                 if (seccion is null)
                 {
@@ -51,7 +51,7 @@ namespace Iso810.Services
                 }
 
                 var sector  = await _context.Sectores
-                    .FirstOrDefaultAsync(x => x.Nombre == info.Sector);
+                    .FirstOrDefaultAsync(x => x.Nombre.ToLower() == info.Sector.ToLower());
                 
                 if (sector is null)
                 {
@@ -60,7 +60,7 @@ namespace Iso810.Services
                 }
 
                 var provincia = await _context.Provincias
-                    .FirstOrDefaultAsync(x => x.Nombre == info.Provincia);
+                    .FirstOrDefaultAsync(x => x.Nombre.ToLower() == info.Provincia.ToLower());
 
                 if (provincia is null)
                 {
@@ -69,7 +69,7 @@ namespace Iso810.Services
                 }
 
                 var tanda = await _context.Tandas
-                    .FirstOrDefaultAsync(x => x.Nombre == info.Tanda);
+                    .FirstOrDefaultAsync(x => x.Nombre.ToLower() == info.Tanda.ToLower());
                 
                 if (tanda is null)
                 {
@@ -108,7 +108,7 @@ namespace Iso810.Services
                 }
 
                 var asignatura = await _context.Asignaturas
-                    .FirstOrDefaultAsync(x => x.Nombre.ToLower() == info.Asignatura.ToLower());
+                    .FirstOrDefaultAsync(x => x.Nombre.ToLower().ToLower() == info.Asignatura.ToLower());
 
                 if (asignatura is null)
                 {
