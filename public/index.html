@@ -8,17 +8,37 @@
 </head>
 <body>
     <div class="formulario" x-data="form()">
-        <input id="uploadInput" type="file" accept=".txt, .csv">
+        <div>
+            <span>Subir csv o txt</span>
+            <input id="uploadCsv" type="file" accept=".txt, .csv">
+        </div>
+        
+        <div>
+            <span>Subir xml o txt</span>
+            <input id="uploadXml" type="file" accept=".txt, .xml">
+        </div>
         <br>
-        <button id="uplaoad" type="button" @click="upload">Subir<br>
-        <button id="download" type="button" @click="download">Descargar<br>
+        <br>
+
+        <button class="green-button" type="button" @click="upload">Subir</button>
+        <br>
+        <br>
+        <button class="red-button" type="button" @click="download">Descargar</button>
+        <br>
+        <br>
+        <button class="green-button" type="button" @click="import_xml">Importar a XML</button>
+        <br>
+        <br>
+        <button class="red-button" type="button" @click="export_xml">Exportar a XML</button>
+        <br>
+        <br>
     </div>
 
     <script>
         function form() {
             return {
                 async upload() {
-                    const input = document.getElementById("uploadInput");
+                    const input = document.getElementById("uploadCsv");
                     const file = input.files[0];
                     if (!file) {
                         return alert("Debes seleccionar un archivo")
@@ -67,6 +87,34 @@
                     }
 
                     return text
+                },
+                async export_xml() {
+                    const request = await fetch("http://localhost:5000/api/export");
+                    const file = await request.blob();
+                    
+                    const url = window.URL.createObjectURL(file);
+                    const link = document.createElement("a");
+
+                    link.setAttribute("href", url);
+                    link.setAttribute("download", "export.xml");
+                    document.body.appendChild(link);
+
+                    link.click();
+                },
+                async import_xml() {
+                    const input = document.getElementById("uploadXml");
+                    const file = input.files[0];
+                    if (!file) {
+                        return alert("Debes seleccionar un archivo")
+                    }
+
+                    const formData = new FormData();
+                    formData.append("file", file, file.name)
+
+                    const { result } = await fetch("http://localhost:5000/api/import", {
+                        method: "POST",
+                        body: formData
+                    });
                 }
             }
         }

@@ -16,13 +16,15 @@ namespace Iso810.Controllers
     {
         private readonly MainContext _context;
         private readonly ICsvService _csvService;
+        private readonly IXmlService _xmlService;
 
-        public ApiController(MainContext context, ICsvService csvService)
+        public ApiController(MainContext context, ICsvService csvService, IXmlService xmlService = null)
         {
             _context = context;
             _csvService = csvService;
+            _xmlService = xmlService;
         }
-        
+
         [HttpGet]
         public async Task<IEnumerable<StudentsView>> Get()
         {
@@ -52,6 +54,36 @@ namespace Iso810.Controllers
                 var header = _csvService.GetHeaders();
                 var data = await _csvService.DownloadData();
                 return new { header = header, data = data };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error has been detected.", ex);
+            }
+        }
+
+        [HttpPost("import")]
+        public async Task<ICollection<StudentsView>> Import(IFormFile file)
+        {
+            try
+            {
+                var stream = file.OpenReadStream();
+                return await _xmlService.ImportFile(stream);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error has been detected.", ex);
+            }
+        }
+
+        [HttpGet("export")]
+        public async Task<IActionResult> Export()
+        {
+            try
+            {
+                return File(
+                    await _xmlService.SaveFile(),
+                    "application/xml"
+                );
             }
             catch (Exception ex)
             {

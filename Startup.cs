@@ -39,6 +39,8 @@ namespace Iso810
             });
 
             services.AddScoped<ICsvService, CsvService>();
+            services.AddScoped<IXmlService, XmlService>();
+            services.AddScoped<IDatabaseService, DatabaseService>();
 
             services.AddControllers();
         }

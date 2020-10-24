@@ -10,10 +10,12 @@ namespace Iso810.Services
     public class CsvService : ICsvService
     {
         private readonly MainContext _context;
+        private readonly IDatabaseService _databaseService;
 
-        public CsvService(MainContext context)
+        public CsvService(MainContext context, IDatabaseService databaseService)
         {
             _context = context;
+            _databaseService = databaseService;
         }
 
         public async Task<ICollection<StudentsView>> UploadData(string source)
@@ -23,7 +25,7 @@ namespace Iso810.Services
                 .ToList();
             var list = ArrayToList(arr);
 
-            await SaveData(list);
+            await _databaseService.SaveData(list);
 
             return list;
         }
@@ -65,132 +67,6 @@ namespace Iso810.Services
             }
 
             return text;
-        }
-
-        private async Task SaveData(List<StudentsView> source)
-        {
-            foreach (var info in source)
-            {
-                var grado = await _context.Grados
-                    .FirstOrDefaultAsync(x => x.Nombre == info.Grado);
-                
-                if (grado is null)
-                {
-                    grado = new Grados { Nombre = info.Grado };
-                    await _context.Grados.AddAsync(grado);
-                }
-
-                var seccion = await _context.Secciones
-                    .FirstOrDefaultAsync(x => x.Nombre == info.Seccion);
-                
-                if (seccion is null)
-                {
-                    seccion = new Secciones { Nombre = info.Seccion };
-                    await _context.Secciones.AddAsync(seccion);
-                }
-
-                var seccionGrado = await _context.SeccionesGrados
-                    .FirstOrDefaultAsync(x => x.GradoId == grado.Id && x.SeccionId == seccion.Id);
-
-                if (seccionGrado is null)
-                {
-                    seccionGrado = new SeccionesGrados
-                    {
-                        Grado = grado,
-                        Seccion = seccion
-                    };
-                    await _context.SeccionesGrados.AddAsync(seccionGrado);
-                }
-
-                var sector  = await _context.Sectores
-                    .FirstOrDefaultAsync(x => x.Nombre == info.Sector);
-                
-                if (sector is null)
-                {
-                    sector = new Sectores { Nombre = info.Sector };
-                    await _context.Sectores.AddAsync(sector);
-                }
-
-                var provincia = await _context.Provincias
-                    .FirstOrDefaultAsync(x => x.Nombre == info.Provincia);
-
-                if (provincia is null)
-                {
-                    provincia = new Provincias { Nombre = info.Provincia };
-                    await _context.Provincias.AddAsync(provincia);
-                }
-
-                var tanda = await _context.Tandas
-                    .FirstOrDefaultAsync(x => x.Nombre == info.Tanda);
-                
-                if (tanda is null)
-                {
-                    tanda = new Tandas { Nombre = info.Tanda };
-                    await _context.Tandas.AddAsync(tanda);
-                }
-                
-                var escuela = await _context.Escuelas
-                    .FirstOrDefaultAsync(x => x.Id == info.CodigoDelCentro);
-
-                if (escuela is null)
-                {
-                    escuela = new Escuelas
-                    {
-                        Id = info.CodigoDelCentro,
-                        Nombre = info.NombreDelCentro,
-                        Sector = sector,
-                        Provincia = provincia
-                    };
-                    await _context.Escuelas.AddAsync(escuela);
-                }
-
-                var estudiante = await _context.Estudiantes
-                    .FirstOrDefaultAsync(x => x.Matricula == info.Matricula);
-
-                if (estudiante is null)
-                {
-                    estudiante = new Estudiantes
-                    {
-                        Matricula = info.Matricula ?? 0,
-                        Nombre = info.NombreDelEstudiante,
-                        Escuela = escuela,
-                        SeccionGrado = seccionGrado
-                    };
-                    await _context.Estudiantes.AddAsync(estudiante);
-                }
-
-                var asignatura = await _context.Asignaturas
-                    .FirstOrDefaultAsync(x => x.Nombre.ToLower() == info.Asignatura.ToLower());
-
-                if (asignatura is null)
-                {
-                    asignatura = new Asignaturas
-                    {
-                        Nombre = info.Asignatura,
-                        Tanda = tanda
-                    };
-                    await _context.Asignaturas.AddAsync(asignatura);
-                }
-
-                var asignatura_estudiante = await _context.AsignaturasEstudiantes
-                    .FirstOrDefaultAsync(x => x.EstudianteId == estudiante.Matricula &&
-                                              x.AsignaturaId == asignatura.Id);
-
-                if (asignatura_estudiante is null)
-                {
-                    asignatura_estudiante = new AsignaturasEstudiantes
-                    {
-                        Estudiante = estudiante,
-                        Asignatura = asignatura,
-                        Calificacion = info.Calificacion ?? 0,
-                        CondicionAcademica = info.CondicionAcademica
-                    };
-                    await _context.AsignaturasEstudiantes.AddAsync(asignatura_estudiante);
-                }
-                    
-
-                await _context.SaveChangesAsync();
-            }
         }
 
         private List<StudentsView> ArrayToList(List<string> lines)
