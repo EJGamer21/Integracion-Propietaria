@@ -1,123 +1,111 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.7.0/dist/alpine.min.js" defer></script>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.7.0/dist/alpine.min.js" defer></script>
+    <script src="script.js"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.14.0/js/all.js"></script>
     <title>Subir archivo</title>
 </head>
 <body>
-    <div class="formulario" x-data="form()">
-        <div>
-            <span>Subir csv o txt</span>
-            <input id="uploadCsv" type="file" accept=".txt, .csv">
+    <section class="section">
+        <div class="container">
+            <h1 class="title is-2">Integracion de datos</h1>
         </div>
-        
-        <div>
-            <span>Subir xml o txt</span>
-            <input id="uploadXml" type="file" accept=".txt, .xml">
+    </section>
+
+    <section class="section" x-data="form()">
+        <div class="container">
+            <h2 class="title is-4">Importar y exportar datos</h2>
+            <div class="columns">
+                <div class="column">
+                    <div class="field has-addons">
+                        <div class="control is-expanded">
+                            <div class="file has-name is-right is-fullwidth">
+                                <label class="file-label">
+                                    <input type="file" class="file-input" accept=".txt, .csv" @change="setCsvFile">
+                                    <span class="file-name" x-text="csvFile.name"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <button class="button is-primary" :disabled="!csvFile.raw" @click="upload">
+                                <span><i class="fas fa-upload"></i>&nbsp;</span>
+                                <span>Subir CSV</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="columns is-mobile">
+                        <div class="column">
+                            <button class="button is-danger is-fullwidth" @click="download">
+                                <span><i class="fas fa-download"></i>&nbsp;</span>
+                                <span>Descargar CSV</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="column">
+                    <div class="field has-addons">
+                        <div class="control is-expanded">
+                            <div class="file has-name is-right is-fullwidth">
+                                <label class="file-label">
+                                    <input type="file" class="file-input" accept=".txt, .xml" @change="setXmlFile">
+                                    <span class="file-name" x-text="xmlFile.name"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <button class="button is-primary" :disabled="!xmlFile.raw" @click="import_xml">
+                                <span><i class="fas fa-upload"></i>&nbsp;</span>
+                                <span>Subir XML</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="columns is-mobile">
+                        <div class="column">
+                            <button class="button is-danger is-fullwidth" @click="export_xml">
+                                <span><i class="fas fa-download"></i>&nbsp;</span>
+                                <span>Descargar XML</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <br>
-        <br>
+    </section>
 
-        <button class="green-button" type="button" @click="upload">Subir</button>
-        <br>
-        <br>
-        <button class="red-button" type="button" @click="download">Descargar</button>
-        <br>
-        <br>
-        <button class="green-button" type="button" @click="import_xml">Importar a XML</button>
-        <br>
-        <br>
-        <button class="red-button" type="button" @click="export_xml">Exportar a XML</button>
-        <br>
-        <br>
-    </div>
-
-    <script>
-        function form() {
-            return {
-                async upload() {
-                    const input = document.getElementById("uploadCsv");
-                    const file = input.files[0];
-                    if (!file) {
-                        return alert("Debes seleccionar un archivo")
-                    }
-
-                    const formData = new FormData();
-                    formData.append("file", file, file.name)
-
-                    const { result } = await fetch("http://localhost:5000/api/upload", {
-                        method: "POST",
-                        body: formData
-                    });
-                },
-                async download() {
-                    const request = await fetch("http://localhost:5000/api/download");
-                    const { header, data } = await request.json();
-
-                    let csvContent = "data:text/csv;charset=utf-8,";
-                    csvContent += this.getHeader(header);
-                    csvContent += data;
-                    
-                    const uri = encodeURI(csvContent);
-
-                    const link = document.createElement("a");
-                    link.setAttribute("href", uri);
-                    link.setAttribute("download", "MINERDd.csv");
-                    document.body.appendChild(link);
-
-                    link.click();
-                },
-                isLastProperty(property, array) {
-                    return property === array[array.length - 1];
-                },
-                getHeader(source = "") {
-                    let text = "";
-                    const values = source.split(',');
-
-                    const toSentence = (txt) => {
-                        return txt.replace(/([A-Z])/g, " $1");
-                    }
-
-                    for (const value of values) {
-                        text += this.isLastProperty(value, values)
-                            ? toSentence(value).toUpperCase() + "\n"
-                            : toSentence(value).toUpperCase() + ",";
-                    }
-
-                    return text
-                },
-                async export_xml() {
-                    const request = await fetch("http://localhost:5000/api/export");
-                    const file = await request.blob();
-                    
-                    const url = window.URL.createObjectURL(file);
-                    const link = document.createElement("a");
-
-                    link.setAttribute("href", url);
-                    link.setAttribute("download", "export.xml");
-                    document.body.appendChild(link);
-
-                    link.click();
-                },
-                async import_xml() {
-                    const input = document.getElementById("uploadXml");
-                    const file = input.files[0];
-                    if (!file) {
-                        return alert("Debes seleccionar un archivo")
-                    }
-
-                    const formData = new FormData();
-                    formData.append("file", file, file.name)
-
-                    const { result } = await fetch("http://localhost:5000/api/import", {
-                        method: "POST",
-                        body: formData
-                    });
-                }
-            }
-        }
-    </script>
+    <section class="section" x-data="table()" x-init="loadTable">
+        <div class="container">
+            <h2 class="title is-4">Visualizar datos</h2>
+            <table class="table is-dark is-bordered is-striped is-hoverable">
+                <thead>
+                    <template x-for="column in columns">
+                        <th x-text="column.title"></th>
+                    </template>
+                </thead>
+                <tbody>
+                    <template x-for="row in rows">
+                        <tr>
+                            <td x-text="row.codigoDelCentro"></td>
+                            <td x-text="row.nombreDelCentro"></td>
+                            <td x-text="row.sector"></td>
+                            <td x-text="row.provincia"></td>
+                            <td x-text="row.matricula"></td>
+                            <td x-text="row.nombreDelEstudiante"></td>
+                            <td x-text="row.asignatura"></td>
+                            <td x-text="row.tanda"></td>
+                            <td x-text="row.calificacion"></td>
+                            <td x-text="row.condicionAcademica"></td>
+                            <td x-text="row.seccion"></td>
+                            <td x-text="row.grado"></td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
+    </section>
 </body>
 </html>
